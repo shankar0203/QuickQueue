@@ -227,15 +227,13 @@ const LandingPage = () => {
                     {event.description}
                   </p>
                   
-                  <Link to={`/events/${event.id}`}>
-                    <Button
-                      className="w-full btn-primary"
-                      data-testid={`book-now-${event.id}`}
-                    >
-                      <Star className="w-4 h-4" />
-                      Book Now
-                    </Button>
-                  </Link>
+                  <Button
+                    className="w-full btn-primary"
+                    data-testid={`book-now-${event.id}`}
+                  >
+                    <Star className="w-4 h-4" />
+                    Book Now
+                  </Button>
                 </CardContent>
               </Card>
               </Link>
