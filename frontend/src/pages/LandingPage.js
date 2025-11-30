@@ -238,6 +238,7 @@ const LandingPage = () => {
                   </Link>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}
