@@ -190,4 +190,7 @@ jspm_packages/
 # SvelteKit build / generate output
 .svelte-kit
 
-# End of https://www.toptal.com/developers/gitignore/api/node,python,visualstudiocode
+# End of https://www.toptal.com/developers/gitignore/api/node,python,visualstudiocode-e 
+# Environment files
+*.env
+*.env.*
