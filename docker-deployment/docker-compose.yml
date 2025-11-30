@@ -1,0 +1,322 @@
+version: '3.8'
+
+services:
+  # Reverse Proxy & Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: quickqueue-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - quickqueue-network
+    environment:
+      - DOMAIN=${DOMAIN}
+    labels:
+      - "com.quickqueue.service=nginx"
+      - "com.quickqueue.description=Reverse Proxy"
+
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        - REACT_APP_BACKEND_URL=https://${DOMAIN}
+        - REACT_APP_RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+    container_name: quickqueue-frontend
+    restart: unless-stopped
+    expose:
+      - "80"
+    volumes:
+      - frontend_assets:/app/build/static
+    networks:
+      - quickqueue-network
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "com.quickqueue.service=frontend"
+      - "com.quickqueue.description=React Frontend"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: quickqueue-backend
+    restart: unless-stopped
+    expose:
+      - "8001"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - quickqueue-network
+    environment:
+      # Database
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=${DB_NAME}
+      - REDIS_URL=redis://redis:6379
+      
+      # API Configuration
+      - API_VERSION=v1
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      
+      # Security
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      
+      # Payment Integration
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET}
+      
+      # WhatsApp Integration
+      - WHATSAPP_API_URL=${WHATSAPP_API_URL}
+      - WHATSAPP_API_TOKEN=${WHATSAPP_API_TOKEN}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
+      
+      # Email Configuration
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL}
+      
+      # File Storage
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_REGION=${AWS_REGION}
+      
+      # Monitoring
+      - SENTRY_DSN=${SENTRY_DSN}
+      - ENABLE_METRICS=true
+    depends_on:
+      - mongodb
+      - redis
+    labels:
+      - "com.quickqueue.service=backend"
+      - "com.quickqueue.description=FastAPI Backend"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Database
+  mongodb:
+    image: mongo:6.0
+    container_name: quickqueue-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./backup:/backup
+      - ./mongodb/mongod.conf:/etc/mongod.conf
+      - ./mongodb/init:/docker-entrypoint-initdb.d
+    networks:
+      - quickqueue-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${DB_NAME}
+    command: mongod --config /etc/mongod.conf
+    labels:
+      - "com.quickqueue.service=mongodb"
+      - "com.quickqueue.description=MongoDB Database"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: quickqueue-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf
+    networks:
+      - quickqueue-network
+    command: redis-server /etc/redis/redis.conf
+    labels:
+      - "com.quickqueue.service=redis"
+      - "com.quickqueue.description=Redis Cache"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: quickqueue-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - quickqueue-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    labels:
+      - "com.quickqueue.service=prometheus"
+      - "com.quickqueue.description=Metrics Collection"
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: quickqueue-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - quickqueue-network
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    labels:
+      - "com.quickqueue.service=grafana"
+      - "com.quickqueue.description=Monitoring Dashboard"
+
+  # Logging - Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    container_name: quickqueue-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - quickqueue-network
+    labels:
+      - "com.quickqueue.service=elasticsearch"
+      - "com.quickqueue.description=Log Storage"
+
+  # Logging - Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    container_name: quickqueue-kibana
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - quickqueue-network
+    labels:
+      - "com.quickqueue.service=kibana"
+      - "com.quickqueue.description=Log Visualization"
+
+  # Logging - Filebeat
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.8.0
+    container_name: quickqueue-filebeat
+    restart: unless-stopped
+    user: root
+    volumes:
+      - ./logging/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./logs:/app/logs:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - quickqueue-network
+    labels:
+      - "com.quickqueue.service=filebeat"
+      - "com.quickqueue.description=Log Shipping"
+
+  # Backup Service
+  backup:
+    build:
+      context: ./backup
+      dockerfile: Dockerfile
+    container_name: quickqueue-backup
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/mongodb:ro
+      - ./backup/scripts:/scripts
+      - ./backup/storage:/backup
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - quickqueue-network
+    environment:
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}
+      - BACKUP_RETENTION=${BACKUP_RETENTION:-7}
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_DB=${DB_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${BACKUP_S3_BUCKET}
+    depends_on:
+      - mongodb
+    labels:
+      - "com.quickqueue.service=backup"
+      - "com.quickqueue.description=Automated Backups"
+
+# Networks
+networks:
+  quickqueue-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Volumes
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  frontend_assets:
+    driver: local
