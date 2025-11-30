@@ -182,7 +182,8 @@ const LandingPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event) => (
-              <Card key={event.id} className="card-premium group cursor-pointer" data-testid={`event-card-${event.id}`}>
+              <Link to={`/events/${event.id}`} key={event.id}>
+                <Card className="card-premium group cursor-pointer" data-testid={`event-card-${event.id}`}>
                 <div className="relative overflow-hidden">
                   <img
                     src={event.image_url}
