@@ -195,11 +195,12 @@ const Dashboard = () => {
                       <label className="block text-sm font-medium text-slate-300 mb-2">
                         Category *
                       </label>
-                      <Select value={newEvent.category} onValueChange={(value) => setNewEvent(prev => ({ ...prev, category: value }))}>
+                      <Select value={newEvent.category || "select"} onValueChange={(value) => setNewEvent(prev => ({ ...prev, category: value === "select" ? "" : value }))}>
                         <SelectTrigger className="input-premium">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent className="bg-slate-900 border-white/10">
+                          <SelectItem value="select" disabled>Select category</SelectItem>
                           {categories.map(category => (
                             <SelectItem key={category} value={category}>{category}</SelectItem>
                           ))}
