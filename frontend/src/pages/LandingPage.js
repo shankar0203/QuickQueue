@@ -138,13 +138,13 @@ const LandingPage = () => {
             </div>
 
             {/* Category Filter */}
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}>
               <SelectTrigger className="input-premium" data-testid="category-filter">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-white/10">
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map(category => (
                   <SelectItem key={category} value={category}>{category}</SelectItem>
                 ))}
