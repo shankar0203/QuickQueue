@@ -1,34 +1,248 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+
+/* Set up design system variables from design guidelines */
+:root {
+  /* Colors from design guidelines */
+  --bg-default: #020617;
+  --bg-paper: #0f172a;
+  --bg-subtle: #1e293b;
+  --primary-default: #6366f1;
+  --primary-hover: #4f46e5;
+  --accent-default: #fbbf24;
+  --accent-glow: rgba(251, 191, 36, 0.5);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-active: rgba(99, 102, 241, 0.5);
+  
+  /* Typography */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Manrope', sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Global styles */
+* {
+  box-sizing: border-box;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-default);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.App-link {
-    color: #61dafb;
+/* Typography classes */
+.heading {
+  font-family: var(--font-heading);
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.body-text {
+  font-family: var(--font-body);
+}
+
+/* Remove default app center alignment */
+.App {
+  min-height: 100vh;
+}
+
+/* Custom button styles */
+.btn-primary {
+  background: var(--primary-default);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 1.5rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 1.5rem 1.5rem;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom card styles */
+.card {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border-default);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(24px);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--border-active);
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+}
+
+/* Custom input styles */
+.input {
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: white;
+  transition: all 0.3s ease;
+  outline: none;
+  width: 100%;
+}
+
+.input:focus {
+  border-color: var(--primary-default);
+  box-shadow: 0 0 0 1px var(--primary-default);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Gradient overlays for images */
+.mask-image-gradient-b {
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.8s ease-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-default);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+}
+
+/* Loading spinner */
+.spinner {
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-left-color: var(--primary-default);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .btn-primary, .btn-secondary {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* Focus styles for accessibility */
+.focus\:outline-none:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px var(--primary-default);
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom backdrop blur utilities */
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Text glow effect */
+.text-glow {
+  text-shadow: 0 0 10px currentColor;
+}
+
+/* Box glow effect */
+.box-glow {
+  box-shadow: 0 0 20px var(--accent-glow);
 }
