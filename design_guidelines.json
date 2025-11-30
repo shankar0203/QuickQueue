@@ -1,0 +1,121 @@
+{
+  "design_system": {
+    "name": "QuickQueue Midnight Luxury",
+    "theme": "dark",
+    "description": "A premium, high-contrast dark mode aesthetic designed for nightlife, events, and exclusive experiences. Uses deep slate backgrounds with electric indigo and amber accents.",
+    "typography": {
+      "font_family": {
+        "heading": "Playfair Display, serif",
+        "body": "Manrope, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "scale": {
+        "h1": "text-5xl md:text-7xl font-bold tracking-tight leading-none",
+        "h2": "text-4xl md:text-5xl font-semibold tracking-tight",
+        "h3": "text-2xl md:text-3xl font-medium",
+        "body_lg": "text-lg leading-relaxed text-slate-300",
+        "body_base": "text-base leading-relaxed text-slate-400",
+        "caption": "text-sm tracking-wide uppercase text-slate-500"
+      }
+    },
+    "colors": {
+      "background": {
+        "default": "#020617",
+        "paper": "#0f172a",
+        "subtle": "#1e293b"
+      },
+      "primary": {
+        "default": "#6366f1",
+        "hover": "#4f46e5",
+        "foreground": "#ffffff"
+      },
+      "accent": {
+        "default": "#fbbf24",
+        "glow": "rgba(251, 191, 36, 0.5)"
+      },
+      "text": {
+        "primary": "#f8fafc",
+        "secondary": "#94a3b8",
+        "muted": "#64748b"
+      },
+      "border": {
+        "default": "rgba(255, 255, 255, 0.1)",
+        "active": "rgba(99, 102, 241, 0.5)"
+      }
+    },
+    "spacing": {
+      "container_padding": "px-6 md:px-12 lg:px-24",
+      "section_gap": "py-24 md:py-32",
+      "element_gap": "gap-6 md:gap-8"
+    },
+    "radius": {
+      "default": "rounded-md",
+      "button": "rounded-full",
+      "card": "rounded-xl"
+    },
+    "shadows": {
+      "card": "0 0 0 1px rgba(255,255,255,0.05), 0 4px 20px rgba(0,0,0,0.5)",
+      "glow": "0 0 20px rgba(99, 102, 241, 0.3)"
+    }
+  },
+  "components": {
+    "Button": {
+      "variants": {
+        "primary": "bg-primary text-white hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-medium transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]",
+        "secondary": "bg-white/5 text-white border border-white/10 hover:bg-white/10 rounded-full px-6 py-6 backdrop-blur-md",
+        "ghost": "text-slate-400 hover:text-white hover:bg-white/5 rounded-full px-4 py-2"
+      }
+    },
+    "Card": {
+      "base": "bg-slate-900/50 border border-white/10 backdrop-blur-xl rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] group",
+      "content_padding": "p-6 md:p-8"
+    },
+    "Input": {
+      "base": "bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-slate-600 focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+    },
+    "Badge": {
+      "base": "px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase",
+      "variants": {
+        "success": "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+        "warning": "bg-amber-500/10 text-amber-400 border border-amber-500/20",
+        "neutral": "bg-slate-800 text-slate-400 border border-slate-700"
+      }
+    }
+  },
+  "layout_strategies": {
+    "landing_hero": {
+      "structure": "grid grid-cols-1 lg:grid-cols-12 gap-12 items-center min-h-[90vh]",
+      "text_col": "lg:col-span-7 flex flex-col gap-8 z-10",
+      "image_col": "lg:col-span-5 relative h-full min-h-[500px]",
+      "image_style": "absolute inset-0 w-full h-full object-cover rounded-2xl mask-image-gradient-b"
+    },
+    "bento_grid": {
+      "container": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[300px]",
+      "feature_large": "md:col-span-2 md:row-span-2",
+      "feature_tall": "md:col-span-1 md:row-span-2",
+      "feature_standard": "md:col-span-1 md:row-span-1"
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_main": "https://images.unsplash.com/photo-1514701041007-014cfeef450e?q=80&w=2000&auto=format&fit=crop",
+      "category_music": "https://images.unsplash.com/photo-1514701041007-014cfeef450e?q=80&w=800&auto=format&fit=crop",
+      "category_comedy": "https://images.unsplash.com/photo-1641903806973-17eaf2d2634f?q=80&w=800&auto=format&fit=crop",
+      "category_art": "https://images.unsplash.com/photo-1522878308970-972ec5eedc0d?q=80&w=800&auto=format&fit=crop",
+      "texture_abstract": "https://images.unsplash.com/photo-1604472782307-0f66f8c4df8f?q=80&w=1200&auto=format&fit=crop"
+    },
+    "icons": "Lucide React (default)"
+  },
+  "universal_guidelines": [
+    "Always use 'Playfair Display' for H1-H3 headings to maintain the luxury feel.",
+    "Never use pure black (#000000) for backgrounds; use Slate-950 (#020617) for depth.",
+    "Interactive elements must have a 'glow' effect on hover, not just a color change.",
+    "Use generous padding (p-8+) inside cards to let content breathe.",
+    "All images must have a subtle overlay (bg-black/20) to ensure text readability.",
+    "Use 'backdrop-blur-xl' for all floating elements (navbars, modals, toasts).",
+    "Animations should be slow and smooth (duration-500 or duration-700).",
+    "Do not use gradients for text; keep text solid white or slate-300 for legibility.",
+    "Forms should feel 'hollow' (transparent bg with border) rather than 'filled' (solid bg)."
+  ],
+  "instructions_to_main_agent": "Implement the design system strictly. Start by setting up the global CSS variables in index.css to match the color palette. Install 'Playfair Display' and 'Manrope' from Google Fonts. Use the provided image URLs for the respective sections. For the dashboard, switch to a slightly denser layout but keep the dark theme consistency."
+}
