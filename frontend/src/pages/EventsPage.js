@@ -234,13 +234,13 @@ const EventsPage = () => {
             </Select>
 
             {/* Time Filter */}
-            <Select value={selectedFilter} onValueChange={setSelectedFilter}>
+            <Select value={selectedFilter || "all"} onValueChange={(value) => setSelectedFilter(value === "all" ? "" : value)}>
               <SelectTrigger className="input-premium" data-testid="time-filter">
                 <Calendar className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="All Time" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-white/10">
-                <SelectItem value="">All Time</SelectItem>
+                <SelectItem value="all">All Time</SelectItem>
                 {filters.map(filter => (
                   <SelectItem key={filter.value} value={filter.value}>{filter.label}</SelectItem>
                 ))}
